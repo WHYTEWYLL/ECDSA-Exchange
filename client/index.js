@@ -19,7 +19,7 @@ document.getElementById("transfer-amount").addEventListener('click', () => {
   const sender = document.getElementById("exchange-address").value;
   const amount = document.getElementById("send-amount").value;
   const recipient = document.getElementById("recipient").value;
-  const  privateKey = prompt('Do you choose rock, paper, or scissors?');
+  const  privateKey = prompt('Paste your Private Key: ');
 
   const body = JSON.stringify({
     sender, amount, recipient, privateKey
