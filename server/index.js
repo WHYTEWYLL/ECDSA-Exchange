@@ -14,26 +14,15 @@ const accounts = []
 for (let i = 0; i < 3;i ++ ){
 
   const key = ec.genKeyPair();
-  
+  const publicKey  = key.getPublic('hex').toString(16);
   accounts.push({
-    public:key.getPublic('hex').toString(16),
-    private:key.getPrivate().toString(16),
-    balance: 100
+    public: publicKey,
+    balance: 100,
+    nonce:0
   })
+  console.log(publicKey + "\n with a private key of \n" + key.getPrivate().toString(16) + " has a balance of 100\n");
 
 }
-
-
-console.log('\nAvailable Accounts\n==================')
-accounts.forEach(function(key, i ) {
-  console.log(`(${i}) ${key.public} (${key.balance} ETH) `);
-});
-
-console.log('\nPrivate Keys\n==================')
-accounts.forEach(function(key, i ) {
-  console.log(`(${i}) ${key.private}`);
-});
-
 
 // localhost can have cross origin errors
 // depending on the browser you use!
@@ -62,8 +51,8 @@ app.post('/send', (req, res) => {
   const {sender, recipient, amount, privateKey} = req.body;
 
   //Check PrivateKey-PublicKey
-
-  const result = checker(ec, sender, privateKey)
+  const nonce = accounts.find(elem => {return elem.public === sender}).nonce
+  const result = checker(ec, sender, nonce, recipient, privateKey)
 
 
   if(result){
@@ -74,6 +63,7 @@ app.post('/send', (req, res) => {
     if (balanceSender && balanceRecipient ){
       balanceSender.balance -= amount
       balanceRecipient.balance+= Number(amount);
+      balanceSender.nonce ++
 
       res.send({ balance: balanceSender.balance});
     }else{res.send({ Error: "Not an account"});}
